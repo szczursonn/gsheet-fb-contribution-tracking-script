@@ -1,7 +1,8 @@
 # gsheet-fb-contribution-tracking-script
 
-A Google Apps Script for tracking contribution and attendance of facebook event in google sheet  
-Allows importing facebook event attendance info from csv file
+A Google Apps Script for tracking contribution and attendance of facebook event in google sheet.  
+Allows importing facebook event attendance info from csv file.  
+Paid status and additional info is persisted across imports.
 
 ⚠️ Status column is not internationalized because I don't care.  
 If you use csv with statuses in different language every record will be treated as status change
