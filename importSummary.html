@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+</head>
+
+<body>
+    <div>
+        <h3>
+            <?= data.addedAttendees.length ?> attendees will be added:
+        </h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+            <? for (const attendee of data.addedAttendees) { ?>
+            <tr>
+                <td>
+                    <?= attendee.name ?>
+                </td>
+                <td>
+                    <?= attendee.status ?>
+                </td>
+            </tr>
+            <? } ?>
+        </table>
+
+        <h3>
+            <?= data.statusChangedAttendees.length ?> attendees will change status:
+        </h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Status change</th>
+                <th>Paid</th>
+                <th>Extra info</th>
+            </tr>
+            <? for (const attendee of data.statusChangedAttendees) { ?>
+            <tr>
+                <td>
+                    <?= attendee.name ?>
+                </td>
+                <td>
+                    <?= attendee.oldStatus ?> ->
+                    <?= attendee.status ?>
+                </td>
+                <td>
+                    <?= attendee.paid ?> zł
+                </td>
+                <td>
+                    <?= attendee.extraInfo ?>
+                </td>
+            </tr>
+            <? } ?>
+        </table>
+
+        <h3>
+            <?= data.deletedAttendees.length ?> attendees will be removed:
+        </h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Status change</th>
+                <th>Paid</th>
+                <th>Extra info</th>
+            </tr>
+            <? for (const attendee of data.deletedAttendees) { ?>
+            <tr>
+                <td>
+                    <?= attendee.name ?>
+                </td>
+                <td>
+                    <?= attendee.status ?>
+                </td>
+                <td>
+                    <?= attendee.paid ?> zł
+                </td>
+                <td>
+                    <?= attendee.extraInfo ?>
+                </td>
+            </tr>
+            <? } ?>
+        </table>
+
+        <hr />
+        <h4>
+            <?= data.noChangeCount ?> attendees will not be changed as they have no changes
+        </h4>
+        <h4>
+            <?= data.unsyncedCount ?> attendees will not be changed as they are not synced
+        </h4>
+
+        <p class="warning">CHECK IF CHANGES ARE VALID BEFORE SUBMITING!!!</p>
+
+        <form onsubmit="handleSubmit(event)">
+            <input type="checkbox" id="confirm-checkbox">
+            <label for="confirm-checkbox">yes very nice data</label>
+            <br />
+            <button onclick="handleCancel">Cancel</button>
+            <button class="import" id="submit-btn" disabled>Import</button>
+        </form>
+    </div>
+    <script type="application/json" id="attendeesList">
+        <?!= JSON.stringify(data.currentAttendees) ?>
+      </script>
+
+    <script>
+        const confirmCheckboxEl = document.querySelector('#confirm-checkbox');
+        const submitButtonEl = document.querySelector('#submit-btn');
+
+        function handleSubmit(e) {
+            e.preventDefault();
+
+            confirmCheckboxEl.disabled = true;
+            submitButtonEl.disabled = true;
+
+            const currentAttendees = JSON.parse(document.querySelector('#attendeesList').innerHTML);
+            google.script.run
+                .withSuccessHandler(() => google.script.host.close())
+                .withFailureHandler((err) => {
+                    confirmCheckboxEl.disabled = false;
+                    confirmCheckboxEl.disabled = false;
+
+                    console.error(err);
+                    alert("failed to import csv file!");
+                })
+                .updateSheet(currentAttendees);
+        }
+
+        function handleCancel() {
+            google.script.host.close();
+        }
+
+        confirmCheckboxEl.addEventListener('change', (e) => {
+            submitButtonEl.disabled = !e.currentTarget.checked;
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body div {
+            background-color: #d6e5ff;
+            padding: 10px;
+            border-style: solid;
+            border-color: slategrey;
+            border-width: 2px;
+            border-radius: 5px;
+        }
+
+        th {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        table,
+        td,
+        th {
+            border: 1px solid;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        button {
+            border-radius: 5px;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            font-weight: bold;
+            font-size: medium;
+            margin-top: 10px;
+        }
+
+        button.import {
+            background-color: #71ff8b;
+        }
+
+        .warning {
+            color: red;
+            font-weight: bold;
+            font-size: x-large;
+        }
+    </style>
+</body>
+
+</html>

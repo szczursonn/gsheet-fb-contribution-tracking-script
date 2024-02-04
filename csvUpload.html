@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+</head>
+
+<body>
+    <form>
+        <input type="file" multiple="false" accept=".csv" onchange="handleFileChange()">
+    </form>
+
+    <script>
+        const inputEl = document.querySelector('input');
+
+        async function handleFileChange() {
+            const file = inputEl.files[0];
+
+            if (file) {
+                inputEl.disabled = true;
+                google.script.run
+                    .withSuccessHandler(() => google.script.host.close())
+                    .withFailureHandler((err) => {
+                        inputEl.disabled = false;
+                        console.error(err);
+                        alert("failed to import csv file!");
+                    })
+                    .handleCSVSubmit(await file.text());
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        form {
+            background-color: #d6e5ff;
+            padding: 10px;
+            border-style: solid;
+            border-color: slategrey;
+            border-width: 2px;
+            border-radius: 5px;
+        }
+    </style>
+</body>
+
+</html>
